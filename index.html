@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Bölüşme</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Bölüşme">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="theme-color" content="#0a7d5a">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main id="app">
+
+    <!-- YÜKLENİYOR -->
+    <section id="screen-loading" class="screen">
+      <p class="muted">Yükleniyor…</p>
+    </section>
+
+    <!-- GİRİŞ / KAYIT -->
+    <section id="screen-auth" class="screen hidden">
+      <h1>Bölüşme</h1>
+      <div id="auth-tabs" class="tabs">
+        <button id="tab-login" class="tab active" type="button">Giriş yap</button>
+        <button id="tab-signup" class="tab" type="button">Kayıt ol</button>
+      </div>
+      <form id="auth-form" class="card">
+        <label id="name-field" class="hidden">Adın (gruplarda bu görünecek)
+          <input id="auth-name" type="text" maxlength="40" autocomplete="nickname">
+        </label>
+        <label>E-posta
+          <input id="auth-email" type="email" required autocomplete="email" inputmode="email">
+        </label>
+        <label>Şifre (en az 6 karakter)
+          <input id="auth-password" type="password" required minlength="6" autocomplete="current-password">
+        </label>
+        <button id="auth-submit" type="submit" class="primary">Giriş yap</button>
+        <p id="auth-message" class="message"></p>
+      </form>
+      <button id="forgot-link" type="button" class="link">Şifremi unuttum</button>
+
+      <!-- ŞİFREMİ UNUTTUM -->
+      <form id="forgot-form" class="card hidden">
+        <p class="muted">Kayıtlı e-postanı yaz, sana şifre sıfırlama linki gönderelim.</p>
+        <label>E-posta
+          <input id="forgot-email" type="email" required autocomplete="email" inputmode="email">
+        </label>
+        <button id="forgot-submit" type="submit" class="primary">Link gönder</button>
+        <button id="forgot-cancel" type="button" class="link">‹ Girişe dön</button>
+        <p id="forgot-message" class="message"></p>
+      </form>
+    </section>
+
+    <!-- YENİ ŞİFRE BELİRLEME (sıfırlama linkinden gelince) -->
+    <section id="screen-recovery" class="screen hidden">
+      <h1>Yeni şifre</h1>
+      <form id="recovery-form" class="card">
+        <label>Yeni şifre (en az 6 karakter)
+          <input id="recovery-password" type="password" required minlength="6" autocomplete="new-password">
+        </label>
+        <label>Yeni şifre (tekrar)
+          <input id="recovery-password2" type="password" required minlength="6" autocomplete="new-password">
+        </label>
+        <button id="recovery-submit" type="submit" class="primary">Şifreyi kaydet</button>
+        <p id="recovery-message" class="message"></p>
+      </form>
+    </section>
+
+    <!-- ANA EKRAN: GRUP LİSTESİ -->
+    <section id="screen-home" class="screen hidden">
+      <header class="topbar">
+        <h1>Merhaba, <span id="home-name"></span></h1>
+        <button id="logout-btn" type="button" class="link">Çıkış</button>
+      </header>
+
+      <h2>Grupların</h2>
+      <div id="group-list" class="list"></div>
+      <p id="group-empty" class="muted hidden">Henüz bir grubun yok. Aşağıdan yeni grup kur ya da davet koduyla katıl.</p>
+      <p id="home-message" class="message"></p>
+
+      <h2>Yeni grup</h2>
+      <form id="create-group-form" class="card">
+        <label>Grup adı
+          <input id="new-group-name" type="text" maxlength="60" required placeholder="ör. Kaş tatili">
+        </label>
+        <label>Para birimi (tüm harcamalar bu birimde girilir, sonradan değiştirilemez)
+          <select id="new-group-currency"></select>
+        </label>
+        <button type="submit" class="primary">Grup kur</button>
+        <p id="create-group-message" class="message"></p>
+      </form>
+
+      <h2>Gruba katıl</h2>
+      <form id="join-group-form" class="card">
+        <label>Davet kodu
+          <input id="join-code" type="text" maxlength="8" required
+                 autocapitalize="off" autocomplete="off" spellcheck="false" placeholder="8 karakter">
+        </label>
+        <button type="submit" class="primary">Katıl</button>
+        <p id="join-group-message" class="message"></p>
+      </form>
+    </section>
+
+    <!-- GRUP EKRANI -->
+    <section id="screen-group" class="screen hidden">
+      <header class="topbar">
+        <button id="back-btn" type="button" class="link back">‹ Gruplar</button>
+        <span id="live-status" class="small muted"></span>
+      </header>
+
+      <h1 id="group-title"></h1>
+      <p class="muted">Para birimi: <strong id="group-currency"></strong></p>
+
+      <div class="card">
+        <span class="muted">Davet kodu</span>
+        <div class="row">
+          <code id="group-code" class="code"></code>
+          <button id="copy-code-btn" type="button" class="link">Kopyala</button>
+        </div>
+        <p id="group-message" class="message"></p>
+      </div>
+
+      <h2>Üyeler</h2>
+      <ul id="member-list" class="list plain"></ul>
+
+      <h2>Durum</h2>
+      <div class="card">
+        <div id="my-balance" class="big"></div>
+        <ul id="balance-list" class="list plain compact"></ul>
+        <div class="row muted small">
+          <span>Toplam harcama</span>
+          <span id="group-total"></span>
+        </div>
+      </div>
+
+      <h2>Kim kime ödeyecek?</h2>
+      <ul id="transfer-list" class="list plain"></ul>
+      <p id="transfer-empty" class="muted hidden">Herkes ödeşmiş, kimsenin kimseye borcu yok.</p>
+      <p id="settle-message" class="message"></p>
+
+      <h2>Yapılan ödemeler</h2>
+      <ul id="settlement-list" class="list plain"></ul>
+      <p id="settlement-empty" class="muted hidden">Henüz ödeme kaydı yok.</p>
+
+      <h2>Harcamalar</h2>
+      <button id="add-expense-btn" type="button" class="primary full">+ Harcama ekle</button>
+      <ul id="expense-list" class="list plain"></ul>
+      <p id="expense-empty" class="muted hidden">Henüz harcama yok.</p>
+    </section>
+
+    <!-- HARCAMA EKLEME EKRANI -->
+    <section id="screen-expense" class="screen hidden">
+      <header class="topbar">
+        <button id="expense-cancel" type="button" class="link back">‹ Vazgeç</button>
+      </header>
+
+      <h1>Harcama ekle</h1>
+      <p id="expense-group-name" class="muted"></p>
+
+      <form id="expense-form" class="card" novalidate>
+        <label>Açıklama
+          <input id="expense-description" type="text" maxlength="100" placeholder="ör. Akşam yemeği">
+        </label>
+
+        <label>Tutar (<span id="expense-currency-label"></span>)
+          <input id="expense-amount" type="text" inputmode="decimal" placeholder="0,00" autocomplete="off">
+        </label>
+
+        <label>Tarih
+          <input id="expense-date" type="date">
+        </label>
+
+        <label>Kim ödedi?
+          <select id="expense-payer"></select>
+        </label>
+
+        <div>
+          <div class="row">
+            <span class="muted">Kimler dahil?</span>
+            <button id="toggle-all-btn" type="button" class="link">Hepsi / hiçbiri</button>
+          </div>
+          <div id="expense-participants" class="checks"></div>
+        </div>
+
+        <p id="expense-preview" class="preview"></p>
+        <button id="expense-submit" type="submit" class="primary">Ekle</button>
+        <p id="expense-message" class="message"></p>
+      </form>
+    </section>
+
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+  <script src="expenses.js"></script>
+  <script src="balances.js"></script>
+  <script src="realtime.js"></script>
+</body>
+</html>
